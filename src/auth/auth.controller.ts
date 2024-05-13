@@ -3,10 +3,11 @@ import { AuthService } from './auth.service';
 import { RegisterRequestDto } from './dto/register-request.dto';
 import { RegisterResponseDTO } from './dto/register-response.dto';
 import { FileInterceptor } from '@nestjs/platform-express'; // Import FileInterceptor
-import { File } from 'multer';
+
 import { LoginResponseDTO } from './dto/login-response.dto';
 import { AuthGuard } from '@nestjs/passport';
 import { Public } from './decorators/public.decorator';
+
 @Public()
 @Controller('auth')
 export class AuthController {
@@ -16,13 +17,16 @@ export class AuthController {
   @UseInterceptors(FileInterceptor('image')) // Specify the field name for the uploaded image
   async register(
     @Body() registerBody: RegisterRequestDto,
-    @UploadedFile() imageFile: File, // Access uploaded image file
+    @UploadedFile() imageFile:any, // Access uploaded image file
   ): Promise<RegisterResponseDTO> {
     try {
-      return await this.authService.register(registerBody, imageFile);
+      // console.log("image", imageFile)
+      let data = await this.authService.register(registerBody, imageFile);
+      console.log(data)
+      return data
     } catch (error) {
       // Handle any errors that occur during registration
-      throw new BadRequestException('Registration failed', error.message);
+      throw new BadRequestException('Registration failed', error);
     }
   }
 

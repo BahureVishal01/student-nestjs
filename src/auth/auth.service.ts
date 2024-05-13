@@ -5,7 +5,7 @@ import { AccessToken } from './types/AccessToken';
 import { Student } from 'src/students/entities/student.entity';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
-import { File } from 'multer';
+
 @Injectable()
 export class AuthService {
   constructor(
@@ -13,11 +13,13 @@ export class AuthService {
     private readonly jwtService: JwtService,
   ) {}
 
-  async register(student: RegisterRequestDto, imageFile: File): Promise<AccessToken> {
+  async register(student: RegisterRequestDto, imageFile: any): Promise<AccessToken> {
+    try{
     const existingUser = await this.studentService.findOneByEmail(student.email);
     if (existingUser) {
       throw new BadRequestException('Email already exists');
     }
+    console.log("image", imageFile)
      if(!imageFile){
       throw new BadRequestException('Please provide image')
      }
@@ -27,6 +29,10 @@ export class AuthService {
 
     const payload = { email: data.email, id: data.id };
     return { access_token: this.jwtService.sign(payload) };
+    }catch(error){
+      console.log(error)
+       throw new BadRequestException(error)
+    }
   }
 
   //////// login section ///////
